@@ -1,0 +1,17 @@
+[masters]
+master ansible_host=192.168.86.54 ansible_user=ubuntu
+
+[workers]
+worker1 ansible_host=192.168.86.96 ansible_user=ubuntu
+worker2 ansible_host=192.168.86.184 ansible_user=ubuntu
+worker3 ansible_host=192.168.86.168 ansible_user=ubuntu
+worker4 ansible_host=192.168.86.69 ansible_user=ubuntu
+worker5 ansible_host=192.168.86.40 ansible_user=ubuntu
+worker6 ansible_host=192.168.86.129 ansible_user=ubuntu
+worker7 ansible_host=192.168.86.143 ansible_user=ubuntu
+worker8 ansible_host=192.168.86.93 ansible_user=ubuntu
+worker9 ansible_host=192.168.86.90 ansible_user=ubuntu
+worker10 ansible_host=192.168.86.35 ansible_user=ubuntu
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
