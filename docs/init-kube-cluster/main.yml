@@ -5,6 +5,41 @@
   tasks:
     - include: tasks/inital.yml
 
+- name: set DNS name-server
+  hosts: all
+  #any_errors_fatal: true
+  become: yes
+  pre_tasks:
+    - name: Find mac-address
+      shell: ifconfig ens3 | grep ether
+      register: ens3_mac_address
+    - debug:
+        msg: MAC is {{ ens3_mac_address.stdout.split()[1] }} 
+      tags:
+        - debugsha
+  roles:
+    - role: ansible-netplan
+      become: yes
+      # This role will do nothing unless netplan_enabled is true.
+      netplan_enabled: true
+      # The default is /etc/netplan/config.yaml.
+      netplan_config_file: /etc/netplan/50-cloud-init.yaml
+      # Ubuntu 18.04, for example, defaults to using networkd.
+      netplan_renderer: networkd
+      # Simple network configuration to add a single network
+      # interface.
+      netplan_configuration:
+        network:
+          ethernets:
+            ens3:
+              dhcp4: true
+              match:
+                macaddress: "{{ ens3_mac_address.stdout.split()[1] }}"
+              set-name: ens3
+              nameservers:
+                addresses:
+                - 8.8.8.8
+
 - name: install kube-dependencies 
   hosts: all
   become: yes
