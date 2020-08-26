@@ -1,0 +1,14 @@
+---
+- name: 
+  hosts: all
+  become: true
+  tasks: 
+  - name: Get Node-exporter binary
+    get_url: 
+      url: https://github.com/prometheus/pushgateway/releases/download/v1.2.0/pushgateway-1.2.0.linux-amd64.tar.gz
+      dest: /usr/local/bin
+      mode: 0755
+      owner: root
+      group: root
+
+    

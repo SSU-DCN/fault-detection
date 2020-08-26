@@ -1,0 +1,6 @@
+[hosts]
+hosts1 ansible_host=192.168.10.30 ansible_user=ubuntu
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
