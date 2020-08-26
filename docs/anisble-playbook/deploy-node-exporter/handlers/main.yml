@@ -1,6 +1,0 @@
----
-- name: Start service
-  systemd:
-    name: node-exporter
-    state: started
-    enabled: yes

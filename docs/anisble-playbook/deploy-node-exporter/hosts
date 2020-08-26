@@ -1,6 +1,10 @@
 [hosts]
-hosts1 ansible_host=192.168.10.30 ansible_user=ubuntu
+host3 ansible_host=192.168.86.200
+host1 ansible_host=192.168.86.202
+host2 ansible_host=192.168.86.203
 
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3
 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+ansible_user=ubuntu
+ansible_ssh_pass=ssh_password

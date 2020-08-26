@@ -1,14 +1,48 @@
 ---
-- name: 
+- name: Download Node-exporter binary
   hosts: all
-  become: true
-  tasks: 
+  tasks:
+  - name: echo $HOME
+    shell: "echo $HOME"
+    register: user_homedir
   - name: Get Node-exporter binary
     get_url: 
-      url: https://github.com/prometheus/pushgateway/releases/download/v1.2.0/pushgateway-1.2.0.linux-amd64.tar.gz
+      url: https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz
+      dest: "{{ user_homedir.stdout }}"
+      mode: 0755
+    register: download_node_exporter
+  - name: Extract archive
+    unarchive:
+      src: "{{ download_node_exporter.dest }}"
+      dest: "{{ user_homedir.stdout  }}"
+      mode: 0755
+      remote_src: yes
+      list_files: yes
+    register: node_exporter_dir
+  - name: Copy to local bin
+    become: true
+    copy:
+      src: "{{ user_homedir.stdout }}/{{ node_exporter_dir.files[0] }}node_exporter"
       dest: /usr/local/bin
       mode: 0755
       owner: root
       group: root
-
-    
+      remote_src: true
+- name: Setup sevice
+  hosts: all
+  become: true
+  handlers:
+  - name: Start service
+    become: true
+    systemd:
+      name: node-exporter
+      state: restarted
+      daemon_reload: yes
+  tasks:
+  - name: Copy Service definition
+    copy:
+      src: node-exporter.service
+      dest: /etc/systemd/system
+      owner: root
+      group: root
+    notify: Start service
