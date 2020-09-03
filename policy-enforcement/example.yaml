@@ -1,0 +1,6 @@
+vnf_id: 192.168.10.5
+metric_type: cpu_consumption
+expresstion: abc
+threshold_value: 70
+operator: ">"
+action: example

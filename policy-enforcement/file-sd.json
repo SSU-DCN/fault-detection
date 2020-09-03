@@ -1,0 +1,8 @@
+[
+    {
+        "labels": {
+            "job": "cpu_consumption"
+        },
+        "targets": ["192.168.10.5"]
+    }
+]
