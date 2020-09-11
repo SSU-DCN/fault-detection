@@ -1,0 +1,83 @@
+global:
+  scrape_interval: 10s
+  scrape_timeout: 10s
+  evaluation_interval: 1m
+scrape_configs:
+- job_name: cadvisor
+  honor_timestamps: true
+  scrape_interval: 10s
+  scrape_timeout: 10s
+  metrics_path: /metrics/cadvisor
+  scheme: https
+  kubernetes_sd_configs:
+  - api_server: https://192.168.86.62:6443
+    role: node
+    tls_config:
+      ca_file: /etc/prometheus/pki/ca.crt
+      cert_file: /etc/prometheus/pki/prometheus.crt
+      key_file: /etc/prometheus/pki/prometheus.key
+      insecure_skip_verify: true
+  tls_config:
+    cert_file: /etc/prometheus/pki/prometheus.crt
+    key_file: /etc/prometheus/pki/prometheus.key
+    insecure_skip_verify: true
+  relabel_configs:
+  - separator: ;
+    regex: __meta_kubernetes_node_label_(.+)
+    replacement: $1
+    action: labelmap
+  - separator: ;
+    regex: (.*)
+    target_label: __address__
+    replacement: 192.168.86.62:6443
+    action: replace
+  - source_labels: [__meta_kubernetes_node_name]
+    separator: ;
+    regex: (.+)
+    target_label: __metrics_path__
+    replacement: /api/v1/nodes/${1}:31194/proxy/metrics
+    action: replace
+- job_name: node-exporter-kubernetes-worker
+  honor_timestamps: true
+  scrape_interval: 10s
+  scrape_timeout: 10s
+  metrics_path: /metrics/cadvisor
+  scheme: https
+  kubernetes_sd_configs:
+  - api_server: https://192.168.86.62:6443
+    role: node
+    tls_config:
+      ca_file: /etc/prometheus/pki/ca.crt
+      cert_file: /etc/prometheus/pki/prometheus.crt
+      key_file: /etc/prometheus/pki/prometheus.key
+      insecure_skip_verify: true
+  tls_config:
+    cert_file: /etc/prometheus/pki/prometheus.crt
+    key_file: /etc/prometheus/pki/prometheus.key
+    insecure_skip_verify: true
+  relabel_configs:
+  - separator: ;
+    regex: __meta_kubernetes_node_label_(.+)
+    replacement: $1
+    action: labelmap
+  - separator: ;
+    regex: (.*)
+    target_label: __address__
+    replacement: 192.168.86.62:6443
+    action: replace
+  - source_labels: [__meta_kubernetes_node_name]
+    separator: ;
+    regex: (.+)
+    target_label: __metrics_path__
+    replacement: /api/v1/nodes/${1}:31195/proxy/metrics
+    action: replace
+- job_name: file-sd
+  honor_timestamps: true
+  scrape_interval: 10s
+  scrape_timeout: 10s
+  metrics_path: /metrics
+  scheme: http
+  file_sd_configs:
+  - files:
+    - /etc/prometheus/targets.json
+    refresh_interval: 5m
