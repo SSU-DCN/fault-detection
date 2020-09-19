@@ -1,10 +1,11 @@
 ---
-- name: Update and upgrade apt packages
-  become: yes
-  apt:
-    #upgrade: yes
-    update_cache: yes
-    cache_valid_time: 86400 # update cache oneday
+# - name: Update and upgrade apt packages
+#   become: yes
+#   become_user: root
+#   apt:
+#     #upgrade: yes
+#     update_cache: yes
+#     cache_valid_time: 86400 # update cache oneday
 
 - name: Install CFSSL
   get_url:
@@ -24,5 +25,35 @@
 # - name: Add execute permission cfssljson
 #   file: dest=/home/dcn/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/cfssljson mode=a+x
 
+- name: Install kubectl
+  get_url:
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.18.6/bin/linux/amd64/kubectl
+    dest: /home/dcn/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/
+    mode: a+x
+
 - name: Move cfssl to local bin
-  command: mv cfssl cfssljson /usr/local/bin/
+  command: mv cfssl cfssljson kubectl /usr/local/bin/
+
+- name: checkout cfssl version
+  become: yes
+  shell: cfssl version
+  register: cfssl
+
+- name: checkout cfssljson version
+  become: yes
+  shell: cfssljson --version
+  register: cfssljson
+
+- name: checkout kubectl version
+  become: yes
+  shell: kubectl version --client
+  register: kubectl
+
+- debug:
+    msg:
+      - "CFSSL version {{ cfssl.stdout_lines }}"
+      - "CFSSLJSON version {{ cfssljson.stdout_lines }}"
+      - "KUBECTL version {{ kubectl.stdout_lines }}"
+
+     
+
