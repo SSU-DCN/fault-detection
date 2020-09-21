@@ -16,4 +16,4 @@ To run the scripts:
 ```
 $ ansible -i hosts main.yaml
 ```
-Change the variables in ca.yaml
+Note: Some variables in ca.yaml needs to be changed before running.
