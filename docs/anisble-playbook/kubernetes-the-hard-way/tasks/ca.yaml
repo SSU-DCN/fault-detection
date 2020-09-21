@@ -1,0 +1,243 @@
+---
+- name: set master and worker facts
+  set_fact:
+    workers:
+      instance1: worker1
+      # instance2: worker2
+    certificates:
+      client1: kube-controller-manager
+      client2: kube-proxy
+      client3: kube-scheduler
+      client4: kubernetes # Kubernetes API Server
+      client5: service-account
+    address:
+      # EXTERNAL_IP
+      # INTERNAL_IP
+      KUBERNETES_PUBLIC_ADDRESS: 192.168.5.96 # ip of the master node
+      KUBERNETES_HOSTNAMES: kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.svc.cluster.local
+    
+# Certificate Authority ca.pem and ca-key.pem
+- name: Certificate Authority config json
+  copy:
+    dest: $HOME/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/ca-config.json
+    content: |
+      {
+        "signing": {
+          "default": {
+            "expiry": "8760h"
+          },
+          "profiles": {
+            "kubernetes": {
+              "usages": ["signing", "key encipherment", "server auth", "client auth"],
+              "expiry": "8760h"
+            }
+          }
+        }
+      }
+- name: Certificate Authority csr json
+  copy:
+    dest: $HOME/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/ca-csr.json
+    content: |
+      {
+        "CN": "Kubernetes",
+        "key": {
+          "algo": "rsa",
+          "size": 2048
+        },
+        "names": [
+          {
+            "C": "US",
+            "L": "Portland",
+            "O": "Kubernetes",
+            "OU": "CA",
+            "ST": "Oregon"
+          }
+        ]
+      }
+- name: Generate CA pem
+  shell: cfssl gencert -initca ca-csr.json | cfssljson -bare ca
+
+# Certificate Authority - The Admin Client Certificate: admin-key.pem and admin.pem
+- name: Certificate Authority config json
+  copy:
+    dest: $HOME/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/admin-csr.json
+    content: |
+      {
+        "CN": "admin",
+        "key": {
+          "algo": "rsa",
+          "size": 2048
+        },
+        "names": [
+          {
+            "C": "US",
+            "L": "Portland",
+            "O": "system:masters",
+            "OU": "Kubernetes The Hard Way",
+            "ST": "Oregon"
+          }
+        ]
+      }
+- name: Generate admin client certificate
+  shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes admin-csr.json | cfssljson -bare admin
+
+- debug:
+    msg: "Instance name is {{item.value}}"
+  with_dict: "{{ workers }}"
+
+# The Kubelet Client Certificates
+- name: Generate The Kubelet Client Certificates
+  copy: 
+    dest: $HOME/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/{{ item.value }}-csr.json
+    content: |
+      {
+        "CN": "system:node:{{ item.value }}",
+        "key": {
+          "algo": "rsa",
+          "size": 2048
+        },
+        "names": [
+          {
+            "C": "US",
+            "L": "Portland",
+            "O": "system:nodes",
+            "OU": "Kubernetes The Hard Way",
+            "ST": "Oregon"
+          }
+        ]
+      }
+  with_dict: "{{ workers }}"
+
+- name: Generate worker client certificate
+  shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname={{ item.value }} -profile=kubernetes {{ item.value }}-csr.json | cfssljson -bare {{ item.value }}
+  with_dict: "{{ workers }}"
+
+# The Controller Manager Client Certificate
+- name: Controller manager client kube-controller-manager-csr.json
+  copy:
+    dest: $HOME/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/kube-controller-manager-csr.json
+    content: |
+      {
+        "CN": "system:kube-controller-manager",
+        "key": {
+          "algo": "rsa",
+          "size": 2048
+        },
+        "names": [
+          {
+            "C": "US",
+            "L": "Portland",
+            "O": "system:kube-controller-manager",
+            "OU": "Kubernetes The Hard Way",
+            "ST": "Oregon"
+          }
+        ]
+      }
+
+- name: Generate Controller manager client certificate
+  shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-controller-manager-csr.json | cfssljson -bare kube-controller-manager
+
+# The Kube Proxy Client Certificate
+- name: Kube Proxy Client Certificate kube-proxy-csr.json
+  copy:
+    dest: $HOME/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/kube-proxy-csr.json
+    content: |
+      {
+        "CN": "system:kube-proxy",
+        "key": {
+          "algo": "rsa",
+          "size": 2048
+        },
+        "names": [
+          {
+            "C": "US",
+            "L": "Portland",
+            "O": "system:node-proxier",
+            "OU": "Kubernetes The Hard Way",
+            "ST": "Oregon"
+          }
+        ]
+      }
+
+- name: Kube Proxy Client client certificate
+  shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-proxy-csr.json | cfssljson -bare kube-proxy
+
+# The Scheduler Client Certificate
+- name: Scheduler Client Certificate kube-scheduler-csr.json
+  copy:
+    dest: $HOME/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/kube-scheduler-csr.json
+    content: |
+      {
+        "CN": "system:kube-scheduler",
+        "key": {
+          "algo": "rsa",
+          "size": 2048
+        },
+        "names": [
+          {
+            "C": "US",
+            "L": "Portland",
+            "O": "system:kube-scheduler",
+            "OU": "Kubernetes The Hard Way",
+            "ST": "Oregon"
+          }
+        ]
+      }
+
+- name: Generate Scheduler Client Certificate
+  shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-scheduler-csr.json | cfssljson -bare kube-scheduler
+
+# The Kubernetes API Server Certificate
+- name: Kubernetes API Server Certificate kubernetes-csr.json
+  copy:
+    dest: $HOME/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/kubernetes-csr.json
+    content: |
+      {
+        "CN": "kubernetes",
+        "key": {
+          "algo": "rsa",
+          "size": 2048
+        },
+        "names": [
+          {
+            "C": "US",
+            "L": "Portland",
+            "O": "Kubernetes",
+            "OU": "Kubernetes The Hard Way",
+            "ST": "Oregon"
+          }
+        ]
+      }
+
+- name: Generate Kubernetes API Server Certificate
+  shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname=10.32.0.1,{{address.KUBERNETES_PUBLIC_ADDRESS}},127.0.0.1,{{address.KUBERNETES_HOSTNAMES}} -profile=kubernetes kubernetes-csr.json | cfssljson -bare kubernetes
+
+- debug:
+    msg: 
+    - "Instance name is {{address.KUBERNETES_PUBLIC_ADDRESS}}"
+    - "Instance name is {{address.KUBERNETES_HOSTNAMES}}"
+
+# The Service Account Key Pair
+- name: Kubernetes service-account Certificate service-account-csr.json
+  copy:
+    dest: $HOME/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/service-account-csr.json
+    content: |
+      {
+        "CN": "service-accounts",
+        "key": {
+          "algo": "rsa",
+          "size": 2048
+        },
+        "names": [
+          {
+            "C": "US",
+            "L": "Portland",
+            "O": "Kubernetes",
+            "OU": "Kubernetes The Hard Way",
+            "ST": "Oregon"
+          }
+        ]
+      }
+
+- name: Generate service-account Certificate
+  shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes service-account-csr.json | cfssljson -bare service-account

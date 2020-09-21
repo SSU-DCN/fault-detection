@@ -10,13 +10,13 @@
 - name: Install CFSSL
   get_url:
     url: https://storage.googleapis.com/kubernetes-the-hard-way/cfssl/1.4.1/linux/cfssl
-    dest: /home/dcn/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/
+    dest: $HOME/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/
     mode: a+x
 
 - name: Install CFSSLjson
   get_url:
     url: https://storage.googleapis.com/kubernetes-the-hard-way/cfssl/1.4.1/linux/cfssljson
-    dest: /home/dcn/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/
+    dest: $HOME/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/
     mode: a+x
 
 # - name: Add execute permission cfssl
@@ -28,10 +28,11 @@
 - name: Install kubectl
   get_url:
     url: https://storage.googleapis.com/kubernetes-release/release/v1.18.6/bin/linux/amd64/kubectl
-    dest: /home/dcn/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/
+    dest: $HOME/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/
     mode: a+x
 
 - name: Move cfssl to local bin
+  become: yes
   command: mv cfssl cfssljson kubectl /usr/local/bin/
 
 - name: checkout cfssl version

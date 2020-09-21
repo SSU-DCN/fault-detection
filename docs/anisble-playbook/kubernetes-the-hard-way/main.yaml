@@ -1,6 +1,11 @@
 ---
-- name: inital
+# - name: inital
+#   hosts: localhost
+#   #become: yes
+#   tasks:
+#     - include: tasks/tools.yaml
+- name: certificate authority
   hosts: localhost
-  become: yes
+  #become: yes
   tasks:
-    - include: tasks/tools.yaml
+    - include: tasks/ca.yaml
