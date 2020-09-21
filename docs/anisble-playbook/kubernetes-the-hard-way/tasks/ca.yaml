@@ -15,7 +15,8 @@
       # INTERNAL_IP
       KUBERNETES_PUBLIC_ADDRESS: 192.168.5.96 # ip of the master node
       KUBERNETES_HOSTNAMES: kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.svc.cluster.local
-    
+# - name: Create folder 
+#   shell: mkdir -p keys
 # Certificate Authority ca.pem and ca-key.pem
 - name: Certificate Authority config json
   copy:

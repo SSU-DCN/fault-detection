@@ -1,1 +1,0 @@
-{"CN": "system:node:worker1", "key": {"algo": "rsa", "size": 2048}, "names": [{"C": "US", "ST": "Oregon", "OU": "Kubernetes The Hard Way", "O": "system:nodes", "L": "Portland"}]}
