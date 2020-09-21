@@ -1,0 +1,25 @@
+---
+# The Encryption Key
+- name: Generate an encryption key
+  shell: head -c 32 /dev/urandom | base64
+  register: ENCRYPTION_KEY
+- debug:
+    msg: MAC is {{ ENCRYPTION_KEY.stdout }}
+
+# The Encryption Config File
+- name: Create the encryption-config.yaml encryption config file
+  copy: 
+    dest: $HOME/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/encryption-config.yaml
+    content: |
+      kind: EncryptionConfig
+      apiVersion: v1
+      resources:
+        - resources:
+            - secrets
+          providers:
+            - aescbc:
+                keys:
+                  - name: key1
+                    secret: ${ENCRYPTION_KEY}
+            - identity: {}
+
