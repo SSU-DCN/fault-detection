@@ -1,6 +1,6 @@
 ---
 - name: inital
   hosts: localhost
-  #become: yes
+  # become: yes
   tasks:
     - include: tasks/go-install.yaml

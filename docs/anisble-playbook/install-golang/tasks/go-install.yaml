@@ -1,13 +1,44 @@
 ---
+# Download go-lang version 1.15
 - name: Download go-lang to your local host
   get_url:
     url: https://storage.googleapis.com/golang/go1.15.linux-amd64.tar.gz
     dest: $HOME/fault-detection/docs/anisble-playbook/install-golang
 
-- name: Tar file move go file to /usr/local
+# Unarchive go-lang file
+- name: Tar file
+  unarchive:
+    src: go1.15.linux-amd64.tar.gz
+    dest: .
+# Check if go was installed or not?  
+- name: Check if go is installed?
   shell: |
-    tar -xvf go1.15.linux-amd64.tar.gz
     rm go1.15.linux-amd64.tar.gz
+    ls /usr/local | grep go
+  register: check_go
+
+# If go was'nt installed, just move go to /usr/local 
+- name: move go file to /usr/local if there is no go
+  become: yes
+  shell: |
+    mv go /usr/local
+    rm -rf -R go
+  when: check_go.stdout == ""
+  args:
+    warn: no
+
+# If go was installed, remove old version and move the new to
+- name: move go file to /usr/local if go exist
+  become: yes
+  shell: |
+    rm -rf /usr/local/go
+    mv go /usr/local
+    rm -rf -R go
+  when: check_go.stdout != ""
+  args:
+    warn: no
+
+# Check where is go?
 - name: Find where is go?
   shell: whereis go
   register: go_location
@@ -16,18 +47,25 @@
     msg:
       - "Go location: {{ go_location.stdout_lines }}"
 
-- name: export gopath
-  become: yes
+# Export gopath
+- name: export gopath step 1
+  # become: yes
   lineinfile:
     path: $HOME/.bashrc
     line: export GOPATH=$HOME/go
-  register: go_location
 
+- name: Export gopath step 2
+  become: true
+  become_user: dcn
+  shell: source $HOME/.bashrc executable=/bin/bash
+
+# Create gopath
 - name: create gopath folder
   file:
     path: $HOME/go
     state: directory
 
+# Check go version, is go installed?
 - name: check version
   shell: go version
   register: go_version
