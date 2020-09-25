@@ -1,0 +1,38 @@
+---
+- name: Download go-lang to your local host
+  get_url:
+    url: https://storage.googleapis.com/golang/go1.15.linux-amd64.tar.gz
+    dest: $HOME/fault-detection/docs/anisble-playbook/install-golang
+
+- name: Tar file move go file to /usr/local
+  shell: |
+    tar -xvf go1.15.linux-amd64.tar.gz
+    rm go1.15.linux-amd64.tar.gz
+- name: Find where is go?
+  shell: whereis go
+  register: go_location
+
+- debug:
+    msg:
+      - "Go location: {{ go_location.stdout_lines }}"
+
+- name: export gopath
+  become: yes
+  lineinfile:
+    path: $HOME/.bashrc
+    line: export GOPATH=$HOME/go
+  register: go_location
+
+- name: create gopath folder
+  file:
+    path: $HOME/go
+    state: directory
+
+- name: check version
+  shell: go version
+  register: go_version
+
+- debug:
+    msg:
+      - "Checking GO verion: {{ go_version.stdout_lines }}"
+
