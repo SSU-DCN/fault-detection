@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+service Monitor {
+  rpc NewTargetRequest (MonitorRequest) returns (MonitorReply) {}
+}
+
+message MonitorRequest {
+  string vnf_id = 1;
+  repeated Vdu vdus = 2;
+}
+
+message Vdu {
+  string vnf_name = 1;
+  string mgmt_ip = 2;
+  repeated Alert alerts = 3;
+}
+
+message Alert {
+  string group = 1;
+  string alert = 2;
+  string expr = 3;
+  string duration = 4;
+  map<string, string> labels = 5;
+  map<string, string> annotations = 6;
+}
+
+message MonitorReply {
+  string message = 1;
+  int32 status = 2;
+}

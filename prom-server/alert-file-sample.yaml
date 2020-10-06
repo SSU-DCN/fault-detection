@@ -1,0 +1,11 @@
+group:
+- name: alert
+  rules:
+  - alert: high_cpu
+    annotations:
+      summary: High request latency
+    expr: x>y
+    for: 5m
+    labels:
+      severity: page
+      vnf_name: pageee
