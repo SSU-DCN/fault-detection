@@ -257,7 +257,7 @@ python-zunclient==4.1.0
 pytimeparse==1.1.8
 pytz==2020.1
 pyudev==0.22.0
-pyxdg==0.25
+pyxdg==0.26
 PyYAML==5.3.1
 rcssmin==1.0.6
 redis==3.5.3
