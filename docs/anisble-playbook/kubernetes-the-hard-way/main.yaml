@@ -16,14 +16,20 @@
 #   tasks:
 #     - include: tasks/kube-config.yaml
 
-- name: Generating the Data Encryption Config and Key
-  hosts: localhost
-  #become: yes
-  tasks:
-    - include: tasks/data_encryption.yaml
+# - name: Generating the Data Encryption Config and Key
+#   hosts: localhost
+#   #become: yes
+#   tasks:
+#     - include: tasks/data_encryption.yaml
 
 #### should scp approciate files to each host in cluster
 # script shoule be written here before next
+
+- name: Bootstrapping the etcd Cluster
+  hosts: localhost
+  #become: yes
+  tasks:
+    - include: tasks/bootstrap_etcd.yaml
 
 
 
