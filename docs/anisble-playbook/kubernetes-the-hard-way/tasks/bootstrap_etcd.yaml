@@ -17,13 +17,17 @@
 
 - name: Create etcd directory
   become: yes
-  file:
-    path: "{{ item }}"
-    state: directory
-    mode: 0777
-  with_items:
-  - /etc/etcd
-  - /var/lib/etcd
+  shell: |
+    mkdir /etc/etcd 
+    mkdir /var/lib/etcd
+    chmod 700 /var/lib/etcd
+  # file:
+  #   path: "{{ item }}"
+  #   state: directory
+  #   mode: 0777
+  # with_items:
+  # - /etc/etcd
+  # - /var/lib/etcd
   
 - name: Configure the etcd Server
   become: yes
@@ -68,6 +72,15 @@
       [Install]
       WantedBy=multi-user.target
 
+- name: Change permission pem file in etc/etcd
+  become: yes
+  shell: |
+    chmod 777 /etc/etcd/ca.pem
+    chmod 777 /etc/etcd/kubernetes.pem
+    chmod 777 /etc/etcd/kubernetes-key.pem
+  args:
+    warn: false
+
 - name: Reload daemon
   become: yes
   systemd: daemon_reload=yes
@@ -85,14 +98,12 @@
     state: started
     name: etcd
 
-- name: Change permission pem file in etc/etcd
+- name: Restart service etcd
   become: yes
-  shell: |
-    chmod 777 /etc/etcd/ca.pem
-    chmod 777 /etc/etcd/kubernetes.pem
-    chmod 777 /etc/etcd/kubernetes-key.pem
-  args:
-    warn: false
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: etcd
 
 - name: Verification
   become: yes

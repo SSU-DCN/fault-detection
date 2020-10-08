@@ -1,0 +1,300 @@
+---
+# The Encryption Key
+- name: Update apt packages
+  become: true
+  apt:
+    # update_cache: yes
+    pkg:
+      - socat
+      - conntrack
+      - ipset
+  register: verify
+- debug:
+    msg: key is {{ verify }}
+
+- name: Disable Swap
+  become: yes
+  shell: |
+    swapon --show
+    swapoff -a
+  register: verify_swap
+
+- name: Pull kube binaries for worker
+  get_url:
+    url: "{{ item }}"
+    dest: $HOME/
+    mode: a+x
+  with_items:
+    - https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.18.0/crictl-v1.18.0-linux-amd64.tar.gz
+    - https://github.com/opencontainers/runc/releases/download/v1.0.0-rc92/runc.amd64
+    - https://github.com/containernetworking/plugins/releases/download/v0.8.6/cni-plugins-linux-amd64-v0.8.6.tgz
+    - https://github.com/containerd/containerd/releases/download/v1.3.6/containerd-1.3.6-linux-amd64.tar.gz
+    - https://k8s-pod-migration.obs.eu-de.otc.t-systems.com/v1/kubectl
+    - https://storage.googleapis.com/kubernetes-release/release/v1.18.6/bin/linux/amd64/kube-proxy
+    - https://k8s-pod-migration.obs.eu-de.otc.t-systems.com/v1/kubelet
+
+- name: Create the installation directories
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0777
+  with_items:
+    - /etc/cni/net.d
+    - /opt/cni/bin
+    - /var/lib/kubelet
+    - /var/lib/kube-proxy
+    - /var/lib/kubernetes
+    - /var/run/kubernetes
+
+- name: Install the worker binaries step 1 - extract crictl
+  unarchive:
+    src: crictl-v1.18.0-linux-amd64.tar.gz
+    dest: .
+    remote_src: yes
+
+- name: Install the worker binaries step 2 - extract containerd
+  shell: |
+    tar -xvf containerd-1.3.6-linux-amd64.tar.gz -C containerd
+  args:
+    warn: false
+
+- name: Install the worker binaries step 3 - extract cni
+  become: yes
+  shell: |
+    tar -xvf cni-plugins-linux-amd64-v0.8.6.tgz -C /opt/cni/bin/
+  args:
+    warn: false
+
+- name: Move binaries to /usr/local/bin
+  become: yes
+  shell: |
+    mv runc.amd64 runc
+    chmod +x crictl kubectl kube-proxy kubelet runc
+    mv crictl kubectl kube-proxy kubelet runc /usr/local/bin/
+    mv containerd/bin/* /bin/
+
+- name: Create a storage directory
+  file:
+    path: ./jakob
+    state: directory
+
+- name: Pull Jakob-customized-containerd
+  get_url:
+    url: https://k8s-pod-migration.obs.eu-de.otc.t-systems.com/v2/containerd
+    dest: ./jakob/
+    mode: a+x
+
+- name: Replace conainerd with Jakob-customized-containerd
+  become: yes
+  shell: |
+    mv ./jakob/containerd /bin/
+
+- name: Configure CNI networking - Create the bridge network configuration file
+  become: yes
+  copy:
+    dest: /etc/cni/net.d/10-bridge.conf
+    content: |
+      {
+          "cniVersion": "0.3.1",
+          "name": "bridge",
+          "type": "bridge",
+          "bridge": "cnio0",
+          "isGateway": true,
+          "ipMasq": true,
+          "ipam": {
+              "type": "host-local",
+              "ranges": [
+                [{"subnet": "10.22.0.0/16"}]
+              ],
+              "routes": [{"dst": "0.0.0.0/0"}]
+          }
+      }
+
+- name: Configure CNI networking - Create the loopback network configuration file
+  become: yes
+  copy:
+    dest: /etc/cni/net.d/99-loopback.conf
+    content: |
+      {
+          "cniVersion": "0.3.1",
+          "name": "lo",
+          "type": "loopback"
+      }
+
+- name: Configure containerd - Mkdir /etc/containerd/
+  become: yes
+  file:
+    path: /etc/containerd/
+    state: directory
+
+- name: Configure containerd - Create the containerd configuration file
+  become: yes
+  copy:
+    dest: /etc/containerd/config.toml
+    content: |
+      [plugins]
+        [plugins.cri.containerd]
+          snapshotter = "overlayfs"
+          [plugins.cri.containerd.default_runtime]
+            runtime_type = "io.containerd.runtime.v1.linux"
+            runtime_engine = "/usr/local/bin/runc"
+            runtime_root = ""
+
+- name: Configure containerd - Create the containerd.service systemd unit file
+  become: yes
+  copy:
+    dest: /etc/systemd/system/containerd.service
+    content: |
+      [Unit]
+      Description=containerd container runtime
+      Documentation=https://containerd.io
+      After=network.target
+
+      [Service]
+      ExecStartPre=/sbin/modprobe overlay
+      ExecStart=/bin/containerd
+      Restart=always
+      RestartSec=5
+      Delegate=yes
+      KillMode=process
+      OOMScoreAdjust=-999
+      LimitNOFILE=1048576
+      LimitNPROC=infinity
+      LimitCORE=infinity
+
+      [Install]
+      WantedBy=multi-user.target
+
+- debug:
+    msg: 
+      - "Instance name is {{ ansible_hostname }}"
+
+- name: Configure the Kubelet - Move key to corresponding folder
+  become: yes
+  shell: |
+    mv {{ ansible_hostname }}-key.pem {{ ansible_hostname }}.pem /var/lib/kubelet/
+    mv {{ ansible_hostname }}.kubeconfig /var/lib/kubelet/kubeconfig
+    mv ca.pem /var/lib/kubernetes/
+
+- name: Configure the Kubelet - Create the kubelet-config.yaml configuration file
+  become: yes
+  copy:
+    dest: /var/lib/kubelet/kubelet-config.yaml
+    content: |
+      kind: KubeletConfiguration
+      apiVersion: kubelet.config.k8s.io/v1beta1
+      authentication:
+        anonymous:
+          enabled: false
+        webhook:
+          enabled: true
+        x509:
+          clientCAFile: "/var/lib/kubernetes/ca.pem"
+      authorization:
+        mode: AlwaysAllow
+      clusterDomain: "cluster.local"
+      clusterDNS:
+        - "10.32.0.10"
+      podCIDR: "10.22.0.0/16"
+      resolvConf: "/run/systemd/resolve/resolv.conf"
+      runtimeRequestTimeout: "15m"
+      tlsCertFile: "/var/lib/kubelet/{{ ansible_hostname }}.pem"
+      tlsPrivateKeyFile: "/var/lib/kubelet/{{ ansible_hostname }}-key.pem"
+
+- name: Configure the Kubelet - Create the kubelet.service systemd unit file
+  become: yes
+  copy:
+    dest: /etc/systemd/system/kubelet.service
+    content: |
+      [Unit]
+      Description=Kubernetes Kubelet
+      Documentation=https://github.com/kubernetes/kubernetes
+      After=containerd.service
+      Requires=containerd.service
+
+      [Service]
+      ExecStart=/usr/local/bin/kubelet \
+        --config=/var/lib/kubelet/kubelet-config.yaml \
+        --container-runtime=remote \
+        --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock \
+        --image-pull-progress-deadline=2m \
+        --kubeconfig=/var/lib/kubelet/kubeconfig \
+        --network-plugin=cni \
+        --register-node=true \
+        --v=2
+      Restart=on-failure
+      RestartSec=5
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Configure the Kubernetes Proxy - Move config file to /var/lib/kube-proxy/kubeconfig
+  become: yes
+  command: mv kube-proxy.kubeconfig /var/lib/kube-proxy/kubeconfig
+
+- name: Configure the Kubernetes Proxy - Create the kube-proxy-config.yaml configuration file
+  become: yes
+  copy:
+    dest: /var/lib/kube-proxy/kube-proxy-config.yaml
+    content: |
+      kind: KubeProxyConfiguration
+      apiVersion: kubeproxy.config.k8s.io/v1alpha1
+      clientConnection:
+        kubeconfig: "/var/lib/kube-proxy/kubeconfig"
+      mode: "iptables"
+      clusterCIDR: "10.200.0.0/16"
+
+- name: Configure the Kubernetes Proxy - Create the kube-proxy.service systemd unit file
+  become: yes
+  copy:
+    dest: /etc/systemd/system/kube-proxy.service
+    content: |
+      [Unit]
+      Description=Kubernetes Kube Proxy
+      Documentation=https://github.com/kubernetes/kubernetes
+
+      [Service]
+      ExecStart=/usr/local/bin/kube-proxy \
+        --config=/var/lib/kube-proxy/kube-proxy-config.yaml
+      Restart=on-failure
+      RestartSec=5
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Reload daemon
+  become: yes
+  systemd: daemon_reload=yes
+
+- name: Enable service containerd kubelet kube-proxy
+  become: yes
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    masked: no
+  with_items:
+  - containerd
+  - kubelet
+  - kube-proxy
+
+- name: Start service containerd kubelet kube-proxy
+  become: yes
+  systemd:
+    state: started
+    name: "{{ item }}"
+  with_items:
+  - containerd
+  - kubelet
+  - kube-proxy
+
+- name: Restart service containerd kubelet kube-proxy
+  become: yes
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: "{{ item }}"
+  with_items:
+  - containerd
+  - kubelet
+  - kube-proxy

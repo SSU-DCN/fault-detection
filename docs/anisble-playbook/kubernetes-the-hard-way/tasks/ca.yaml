@@ -13,6 +13,7 @@
     address:
       # EXTERNAL_IP
       # INTERNAL_IP
+      worker1_address: 192.168.10.11
       KUBERNETES_PUBLIC_ADDRESS: 192.168.10.99 # ip of the master node
       KUBERNETES_HOSTNAMES: kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.svc.cluster.local
 # - name: Create folder 
@@ -242,3 +243,7 @@
 
 - name: Generate service-account Certificate
   shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes service-account-csr.json | cfssljson -bare service-account
+
+- name: Transfer ca.pem and key.pem to workers
+  command: scp ca.pem {{ item.value }}-key.pem {{ item.value }}.pem dcn@{{ address.worker1_address }}:~/
+  with_dict: "{{ workers }}"
