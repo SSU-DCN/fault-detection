@@ -1,15 +1,6 @@
 ---
 - name: inital
   hosts: localhost
-  vars:
-    sudoers:
-      - dcn
-  #become: yes
-  tasks:
-    - include: tasks/user_permission.yaml
-
-- name: inital
-  hosts: localhost
   #become: yes
   tasks:
     - include: tasks/tools.yaml
