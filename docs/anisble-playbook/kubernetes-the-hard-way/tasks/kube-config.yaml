@@ -12,8 +12,8 @@
     address:
       # EXTERNAL_IP
       # INTERNAL_IP
-      worker1_address: 192.168.10.11
-      KUBERNETES_PUBLIC_ADDRESS: 192.168.10.99 # ip of the master node
+      worker1_address: 192.168.10.12
+      KUBERNETES_PUBLIC_ADDRESS: 192.168.10.93 # ip of the master node
 
 # The kubelet Kubernetes Configuration File
 - name: Generate a kubeconfig file for each worker node

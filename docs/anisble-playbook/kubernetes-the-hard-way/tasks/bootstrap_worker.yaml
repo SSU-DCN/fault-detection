@@ -1,16 +1,16 @@
 ---
 # The Encryption Key
-- name: Update apt packages
-  become: true
-  apt:
-    # update_cache: yes
-    pkg:
-      - socat
-      - conntrack
-      - ipset
-  register: verify
-- debug:
-    msg: key is {{ verify }}
+# - name: Update apt packages
+#   become: yes
+#   apt:
+#     # update_cache: yes
+#     pkg:
+#       - socat
+#       - conntrack
+#       - ipset
+#   register: verify
+# - debug:
+#     msg: key is {{ verify }}
 
 - name: Disable Swap
   become: yes
@@ -46,7 +46,7 @@
     - /var/lib/kube-proxy
     - /var/lib/kubernetes
     - /var/run/kubernetes
-
+    - containerd
 - name: Install the worker binaries step 1 - extract crictl
   unarchive:
     src: crictl-v1.18.0-linux-amd64.tar.gz
@@ -54,6 +54,7 @@
     remote_src: yes
 
 - name: Install the worker binaries step 2 - extract containerd
+  become: yes
   shell: |
     tar -xvf containerd-1.3.6-linux-amd64.tar.gz -C containerd
   args:

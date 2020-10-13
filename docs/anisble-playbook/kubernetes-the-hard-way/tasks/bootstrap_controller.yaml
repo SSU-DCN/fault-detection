@@ -3,7 +3,7 @@
   set_fact:
     address:
       # EXTERNAL_IP
-      INTERNAL_IP: 192.168.10.99 #ip of master node
+      INTERNAL_IP: 192.168.10.93 #ip of master node
 
 - name: Create the Kubernetes configuration directory
   become: yes
@@ -125,7 +125,7 @@
   copy:
     dest: /etc/kubernetes/config/kube-scheduler.yaml
     content: |
-      apiVersion: kubescheduler.config.k8s.io/v1alpha1
+      apiVersion: kubescheduler.config.k8s.io/v1beta1
       kind: KubeSchedulerConfiguration
       clientConnection:
         kubeconfig: "/var/lib/kubernetes/kube-scheduler.kubeconfig"
