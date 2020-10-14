@@ -18,7 +18,7 @@ $ ansible -i hosts main.yaml
 ```
 Note:
 - This document use "dcn" that is set as root user in both master and worker node.
-- If you wanna change to another user, some source script should be changed to correctly install.
+- If you wanna change to another user, some part in the source scripts should be changed to correctly bootstrap k8s-cluster.
 - The "dcn" user should be added to sudoers by changing /etc/sudoers directory as following:
 ```
 $ sudo visudo
@@ -36,6 +36,6 @@ tasks/
   + ca.yaml
   + kube-config.yaml
 ```
-- The related pod-migartion document: https://docs.google.com/document/d/1E5p_FOHDGAp5YEQ23dCi9I8wPnMzd4aOazxI4uO_AMo/edit#
+- The related pod-migartion document can be found here: https://docs.google.com/document/d/1E5p_FOHDGAp5YEQ23dCi9I8wPnMzd4aOazxI4uO_AMo/edit#
   
  
