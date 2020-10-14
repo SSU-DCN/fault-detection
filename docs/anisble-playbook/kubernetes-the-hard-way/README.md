@@ -16,4 +16,26 @@ To run the scripts:
 ```
 $ ansible -i hosts main.yaml
 ```
-Note: Some variables in ca.yaml needs to be changed before running.
+Note:
+- This document use "dcn" that is set as root user in both master and worker node.
+- If you wanna change to another user, some source script should be changed to correctly install.
+- The "dcn" user should be added to sudoers by changing /etc/sudoers directory as following:
+```
+$ sudo visudo
+```
+```
+dcn   ALL=(ALL:ALL) ALL
+dcn   ALL=(ALL) NOPASSWD: ALL
+```
+- The infomation of master node and worker nodes such as: IP address, hostname... should be change to match your environment:
+```
+  + hosts
+tasks/
+  + bootstrap_controller.yaml
+  + bootstrap_etcd.yaml
+  + ca.yaml
+  + kube-config.yaml
+```
+- The related pod-migartion document: https://docs.google.com/document/d/1E5p_FOHDGAp5YEQ23dCi9I8wPnMzd4aOazxI4uO_AMo/edit#
+  
+ 
