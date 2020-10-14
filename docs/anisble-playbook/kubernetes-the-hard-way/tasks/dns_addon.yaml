@@ -1,0 +1,14 @@
+---
+- name: The DNS Cluster Add-on
+  command: kubectl apply -f https://storage.googleapis.com/kubernetes-the-hard-way/coredns-1.7.0.yaml
+  register: addon
+
+- name: List the pods created by the kube-dns deployment
+  command: kubectl get pods -l k8s-app=kube-dns -n kube-system
+  register: list_dns_pod
+
+- name: Verify DNS add-on insllation
+  debug:
+    msg: 
+    - "{{ addon.stdout.split('\n') }}"
+    - "{{ list_dns_pod.stdout.split('\n') }}"

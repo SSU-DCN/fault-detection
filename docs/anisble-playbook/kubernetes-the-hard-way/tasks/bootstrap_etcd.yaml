@@ -3,7 +3,7 @@
   set_fact:
     address:
       # EXTERNAL_IP
-      INTERNAL_IP: 192.168.10.93 #ip of master node
+      INTERNAL_IP: 192.168.10.96 #ip of master node
 
 - name: Download the official etcd release binaries
   unarchive:

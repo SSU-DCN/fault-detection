@@ -1,46 +1,58 @@
-# ---
-# - name: inital
-#   hosts: localhost
-#   #become: yes
-#   tasks:
-#     - include: tasks/tools.yaml
+---
+- name: inital
+  hosts: localhost
+  #become: yes
+  tasks:
+    - include: tasks/tools.yaml
 
-# - name: Generating certificate authority
-#   hosts: localhost
-#   #become: yes
-#   tasks:
-#     - include: tasks/ca.yaml
+- name: Generating certificate authority
+  hosts: localhost
+  #become: yes
+  tasks:
+    - include: tasks/ca.yaml
 
-# - name: Generating Kubernetes Configuration
-#   hosts: localhost
-#   #become: yes
-#   tasks:
-#     - include: tasks/kube-config.yaml
+- name: Generating Kubernetes Configuration
+  hosts: localhost
+  #become: yes
+  tasks:
+    - include: tasks/kube-config.yaml
 
-# - name: Generating the Data Encryption Config and Key
-#   hosts: localhost
-#   #become: yes
-#   tasks:
-#     - include: tasks/data_encryption.yaml
+- name: Generating the Data Encryption Config and Key
+  hosts: localhost
+  #become: yes
+  tasks:
+    - include: tasks/data_encryption.yaml
 
-# #### should scp approciate files to each host in cluster
-# # script shoule be written here before next
+#### should scp approciate files to each host in cluster
+# script shoule be written here before next
 
-# - name: Bootstrapping the etcd Cluster
-#   hosts: localhost
-#   #become: yes
-#   tasks:
-#     - include: tasks/bootstrap_etcd.yaml
+- name: Bootstrapping the etcd Cluster
+  hosts: localhost
+  #become: yes
+  tasks:
+    - include: tasks/bootstrap_etcd.yaml
 
-# - name: Bootstrapping the controller
-#   hosts: localhost
-#   #become: yes
-#   tasks:
-#     - include: tasks/bootstrap_controller.yaml
+- name: Bootstrapping the controller
+  hosts: localhost
+  #become: yes
+  tasks:
+    - include: tasks/bootstrap_controller.yaml
 
 - name: Bootstrapping the workers
   hosts: workers
   #become: yes
   tasks:
     - include: tasks/bootstrap_worker.yaml
+
+- name: Deploying the DNS Cluster Add-on
+  hosts: localhost
+  #become: yes
+  tasks:
+    - include: tasks/dns_addon.yaml
+
+- name: Bootstrapping the workers
+  hosts: workers
+  #become: yes
+  tasks:
+    - include: tasks/criu_installation.yaml
 

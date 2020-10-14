@@ -13,8 +13,8 @@
     address:
       # EXTERNAL_IP
       # INTERNAL_IP
-      worker1_address: 192.168.10.12
-      KUBERNETES_PUBLIC_ADDRESS: 192.168.10.93 # ip of the master node
+      worker1_address: 192.168.10.13
+      KUBERNETES_PUBLIC_ADDRESS: 192.168.10.96 # ip of the master node
       KUBERNETES_HOSTNAMES: kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.svc.cluster.local
 # - name: Create folder 
 #   shell: mkdir -p keys
