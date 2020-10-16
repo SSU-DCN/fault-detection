@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\rservice.proto\"4\n\x0eMonitorRequest\x12\x0e\n\x06vnf_id\x18\x01 \x01(\t\x12\x12\n\x04vdus\x18\x02 \x03(\x0b\x32\x04.Vdu\"@\n\x03Vdu\x12\x10\n\x08vnf_name\x18\x01 \x01(\t\x12\x0f\n\x07mgmt_ip\x18\x02 \x01(\t\x12\x16\n\x06\x61lerts\x18\x03 \x03(\x0b\x32\x06.Alert\"\xfa\x01\n\x05\x41lert\x12\r\n\x05group\x18\x01 \x01(\t\x12\r\n\x05\x61lert\x18\x02 \x01(\t\x12\x0c\n\x04\x65xpr\x18\x03 \x01(\t\x12\x10\n\x08\x64uration\x18\x04 \x01(\t\x12\"\n\x06labels\x18\x05 \x03(\x0b\x32\x12.Alert.LabelsEntry\x12,\n\x0b\x61nnotations\x18\x06 \x03(\x0b\x32\x17.Alert.AnnotationsEntry\x1a-\n\x0bLabelsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x32\n\x10\x41nnotationsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"/\n\x0cMonitorReply\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\x05\x32?\n\x07Monitor\x12\x34\n\x10NewTargetRequest\x12\x0f.MonitorRequest\x1a\r.MonitorReply\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\rservice.proto\"4\n\x0eMonitorRequest\x12\x0e\n\x06vnf_id\x18\x01 \x01(\t\x12\x12\n\x04vdus\x18\x02 \x03(\x0b\x32\x04.Vdu\"\x17\n\x05VnfId\x12\x0e\n\x06vnf_id\x18\x01 \x01(\t\"W\n\x03Vdu\x12\x10\n\x08vdu_name\x18\x01 \x01(\t\x12\x0f\n\x07mgmt_ip\x18\x02 \x01(\t\x12\x15\n\rexporter_port\x18\x03 \x01(\t\x12\x16\n\x06\x61lerts\x18\x04 \x03(\x0b\x32\x06.Alert\"\xfa\x01\n\x05\x41lert\x12\r\n\x05group\x18\x01 \x01(\t\x12\r\n\x05\x61lert\x18\x02 \x01(\t\x12\x0c\n\x04\x65xpr\x18\x03 \x01(\t\x12\x10\n\x08\x64uration\x18\x04 \x01(\t\x12\"\n\x06labels\x18\x05 \x03(\x0b\x32\x12.Alert.LabelsEntry\x12,\n\x0b\x61nnotations\x18\x06 \x03(\x0b\x32\x17.Alert.AnnotationsEntry\x1a-\n\x0bLabelsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x32\n\x10\x41nnotationsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"/\n\x0cMonitorReply\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\x05\x32l\n\x07Monitor\x12\x34\n\x10NewTargetRequest\x12\x0f.MonitorRequest\x1a\r.MonitorReply\"\x00\x12+\n\x10\x44\x65lTargetRequest\x12\x06.VnfId\x1a\r.MonitorReply\"\x00\x62\x06proto3'
 )
 
 
@@ -64,32 +64,18 @@ _MONITORREQUEST = _descriptor.Descriptor(
 )
 
 
-_VDU = _descriptor.Descriptor(
-  name='Vdu',
-  full_name='Vdu',
+_VNFID = _descriptor.Descriptor(
+  name='VnfId',
+  full_name='VnfId',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='vnf_name', full_name='Vdu.vnf_name', index=0,
+      name='vnf_id', full_name='VnfId.vnf_id', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='mgmt_ip', full_name='Vdu.mgmt_ip', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='alerts', full_name='Vdu.alerts', index=2,
-      number=3, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -106,7 +92,60 @@ _VDU = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=71,
-  serialized_end=135,
+  serialized_end=94,
+)
+
+
+_VDU = _descriptor.Descriptor(
+  name='Vdu',
+  full_name='Vdu',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='vdu_name', full_name='Vdu.vdu_name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='mgmt_ip', full_name='Vdu.mgmt_ip', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='exporter_port', full_name='Vdu.exporter_port', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='alerts', full_name='Vdu.alerts', index=3,
+      number=4, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=96,
+  serialized_end=183,
 )
 
 
@@ -144,8 +183,8 @@ _ALERT_LABELSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=291,
-  serialized_end=336,
+  serialized_start=339,
+  serialized_end=384,
 )
 
 _ALERT_ANNOTATIONSENTRY = _descriptor.Descriptor(
@@ -182,8 +221,8 @@ _ALERT_ANNOTATIONSENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=338,
-  serialized_end=388,
+  serialized_start=386,
+  serialized_end=436,
 )
 
 _ALERT = _descriptor.Descriptor(
@@ -248,8 +287,8 @@ _ALERT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=138,
-  serialized_end=388,
+  serialized_start=186,
+  serialized_end=436,
 )
 
 
@@ -287,8 +326,8 @@ _MONITORREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=390,
-  serialized_end=437,
+  serialized_start=438,
+  serialized_end=485,
 )
 
 _MONITORREQUEST.fields_by_name['vdus'].message_type = _VDU
@@ -298,6 +337,7 @@ _ALERT_ANNOTATIONSENTRY.containing_type = _ALERT
 _ALERT.fields_by_name['labels'].message_type = _ALERT_LABELSENTRY
 _ALERT.fields_by_name['annotations'].message_type = _ALERT_ANNOTATIONSENTRY
 DESCRIPTOR.message_types_by_name['MonitorRequest'] = _MONITORREQUEST
+DESCRIPTOR.message_types_by_name['VnfId'] = _VNFID
 DESCRIPTOR.message_types_by_name['Vdu'] = _VDU
 DESCRIPTOR.message_types_by_name['Alert'] = _ALERT
 DESCRIPTOR.message_types_by_name['MonitorReply'] = _MONITORREPLY
@@ -309,6 +349,13 @@ MonitorRequest = _reflection.GeneratedProtocolMessageType('MonitorRequest', (_me
   # @@protoc_insertion_point(class_scope:MonitorRequest)
   })
 _sym_db.RegisterMessage(MonitorRequest)
+
+VnfId = _reflection.GeneratedProtocolMessageType('VnfId', (_message.Message,), {
+  'DESCRIPTOR' : _VNFID,
+  '__module__' : 'service_pb2'
+  # @@protoc_insertion_point(class_scope:VnfId)
+  })
+_sym_db.RegisterMessage(VnfId)
 
 Vdu = _reflection.GeneratedProtocolMessageType('Vdu', (_message.Message,), {
   'DESCRIPTOR' : _VDU,
@@ -358,8 +405,8 @@ _MONITOR = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=439,
-  serialized_end=502,
+  serialized_start=487,
+  serialized_end=595,
   methods=[
   _descriptor.MethodDescriptor(
     name='NewTargetRequest',
@@ -367,6 +414,16 @@ _MONITOR = _descriptor.ServiceDescriptor(
     index=0,
     containing_service=None,
     input_type=_MONITORREQUEST,
+    output_type=_MONITORREPLY,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='DelTargetRequest',
+    full_name='Monitor.DelTargetRequest',
+    index=1,
+    containing_service=None,
+    input_type=_VNFID,
     output_type=_MONITORREPLY,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
