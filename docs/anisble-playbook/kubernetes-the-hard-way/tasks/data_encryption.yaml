@@ -4,7 +4,7 @@
   shell: head -c 32 /dev/urandom | base64
   register: ENCRYPTION_KEY
 - debug:
-    msg: MAC is {{ ENCRYPTION_KEY.stdout }}
+    msg: key is {{ ENCRYPTION_KEY.stdout }}
 
 # The Encryption Config File
 - name: Create the encryption-config.yaml encryption config file
@@ -20,6 +20,6 @@
             - aescbc:
                 keys:
                   - name: key1
-                    secret: ${ENCRYPTION_KEY}
+                    secret: {{ ENCRYPTION_KEY.stdout }}
             - identity: {}
 

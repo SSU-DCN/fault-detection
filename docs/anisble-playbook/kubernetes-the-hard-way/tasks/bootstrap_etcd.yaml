@@ -1,0 +1,127 @@
+---
+- name: set master and worker facts
+  set_fact:
+    address:
+      # EXTERNAL_IP
+      INTERNAL_IP: 192.168.10.96 #ip of master node
+
+- name: Download the official etcd release binaries
+  unarchive:
+    src: https://github.com/etcd-io/etcd/releases/download/v3.4.10/etcd-v3.4.10-linux-amd64.tar.gz
+    dest: $HOME/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/
+    remote_src: yes
+
+- name: Move etcd to local bin
+  become: yes
+  shell: mv etcd-v3.4.10-linux-amd64/etcd etcd-v3.4.10-linux-amd64/etcdctl /usr/local/bin/
+
+- name: Create etcd directory
+  become: yes
+  shell: |
+    mkdir /etc/etcd 
+    mkdir /var/lib/etcd
+    chmod 700 /var/lib/etcd
+  # file:
+  #   path: "{{ item }}"
+  #   state: directory
+  #   mode: 0777
+  # with_items:
+  # - /etc/etcd
+  # - /var/lib/etcd
+  
+- name: Configure the etcd Server
+  become: yes
+  command: cp ca.pem kubernetes-key.pem kubernetes.pem /etc/etcd/
+
+- debug:
+    msg: 
+    - "Instance name is {{address.INTERNAL_IP}}"
+
+- name: Create the etcd.service systemd unit file
+  become: yes
+  copy:
+    dest: /etc/systemd/system/etcd.service
+    content: |
+      [Unit]
+      Description=etcd
+      Documentation=https://github.com/coreos
+
+      [Service]
+      Type=notify
+      ExecStart=/usr/local/bin/etcd \
+        --name {{ ansible_hostname }} \
+        --cert-file=/etc/etcd/kubernetes.pem \
+        --key-file=/etc/etcd/kubernetes-key.pem \
+        --peer-cert-file=/etc/etcd/kubernetes.pem \
+        --peer-key-file=/etc/etcd/kubernetes-key.pem \
+        --trusted-ca-file=/etc/etcd/ca.pem \
+        --peer-trusted-ca-file=/etc/etcd/ca.pem \
+        --peer-client-cert-auth \
+        --client-cert-auth \
+        --initial-advertise-peer-urls https://{{address.INTERNAL_IP}}:2380 \
+        --listen-peer-urls https://{{address.INTERNAL_IP}}:2380 \
+        --listen-client-urls https://{{address.INTERNAL_IP}}:2379,https://127.0.0.1:2379 \
+        --advertise-client-urls https://{{address.INTERNAL_IP}}:2379 \
+        --initial-cluster-token etcd-cluster-0 \
+        --initial-cluster dcn=https://{{address.INTERNAL_IP}}:2380 \
+        --initial-cluster-state new \
+        --data-dir=/var/lib/etcd
+      Restart=on-failure
+      RestartSec=5
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Change permission pem file in etc/etcd
+  become: yes
+  shell: |
+    chmod 777 /etc/etcd/ca.pem
+    chmod 777 /etc/etcd/kubernetes.pem
+    chmod 777 /etc/etcd/kubernetes-key.pem
+  args:
+    warn: false
+
+- name: Reload daemon
+  become: yes
+  systemd: daemon_reload=yes
+
+- name: Enable service etcd
+  become: yes
+  systemd:
+    name: etcd
+    enabled: yes
+    masked: no
+
+- name: Start service etcd
+  become: yes
+  systemd:
+    state: started
+    name: etcd
+
+- name: Restart service etcd
+  become: yes
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: etcd
+
+- name: Verification
+  become: yes
+  command: etcdctl member list
+  environment:
+    ETCDCTL_API: 3
+    ETCDCTL_ENDPOINTS: https://127.0.0.1:2379
+    ETCDCTL_CACERT: /etc/etcd/ca.pem
+    ETCDCTL_CERT: /etc/etcd/kubernetes.pem
+    ETCDCTL_KEY: /etc/etcd/kubernetes-key.pem
+  register: verify
+- debug:
+    msg: 
+    - "Instance name is {{verify.stdout_lines}}"
+
+# export ETCDCTL_API=3
+# export ETCDCTL_ENDPOINTS="https://127.0.0.1:2379"
+# export ETCDCTL_CACERT="/etc/etcd/ca.pem"
+# export ETCDCTL_CERT="/etc/etcd/kubernetes.pem"
+# export ETCDCTL_KEY="/etc/etcd/kubernetes-key.pem"
+# etcdctl member list

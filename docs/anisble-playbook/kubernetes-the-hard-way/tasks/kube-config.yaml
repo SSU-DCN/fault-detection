@@ -3,16 +3,16 @@
   set_fact:
     workers:
       instance1: worker1
-      instance2: worker2
+      # instance2: worker2
     services:
-      service1: kube-proxy
-      service2: kube-controller-manager
-      service3: kube-scheduler
-      service4: admin 
+      service1: kube-controller-manager
+      service2: kube-scheduler
+      service3: admin 
     address:
       # EXTERNAL_IP
       # INTERNAL_IP
-      KUBERNETES_PUBLIC_ADDRESS: 192.168.5.96 # ip of the master node
+      worker1_address: 192.168.10.13
+      KUBERNETES_PUBLIC_ADDRESS: 192.168.10.96 # ip of the master node
 
 # The kubelet Kubernetes Configuration File
 - name: Generate a kubeconfig file for each worker node
@@ -42,5 +42,7 @@
     kubectl config use-context default --kubeconfig={{ item.value }}.kubeconfig
   with_dict: "{{ services }}"
 
-
+- name: Transfer kubelet and kube-proxy kubeconfig files to each worker
+  command: scp ca.pem {{ item.value }}.kubeconfig kube-proxy.kubeconfig dcn@{{ address.worker1_address }}:~/
+  with_dict: "{{ workers }}"
 

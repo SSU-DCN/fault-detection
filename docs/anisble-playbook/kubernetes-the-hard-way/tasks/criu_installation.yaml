@@ -1,0 +1,72 @@
+---
+- name: Update apt packages
+  become: yes
+  apt:
+    update_cache: yes
+
+- name: Install the dependencies to compile CRIU
+  become: yes
+  apt:
+    pkg:
+    - protobuf-c-compiler
+    - libprotobuf-c0-dev
+    - protobuf-compiler
+    - libprotobuf-dev:amd64
+    - gcc
+    - build-essential
+    - bsdmainutils
+    - python
+    - git-core
+    - asciidoc
+    - make
+    - htop
+    - git
+    - curl
+    - supervisor
+    - cgroup-lite
+    - libapparmor-dev
+    - libseccomp-dev
+    - libprotobuf-dev
+    - libprotobuf-c0-dev
+    - protobuf-c-compiler
+    - protobuf-compiler
+    - python-protobuf
+    - libnl-3-dev
+    - libcap-dev
+    - libaio-dev
+    - apparmor
+    - libnet1-dev
+    - libnl-genl-3-dev
+    - libnl-route-3-dev
+    - libnfnetlink-dev
+    - pkg-config
+
+- name: Clone the CRIU project from mainpage
+  get_url:
+    url: http://download.openvz.org/criu/criu-3.14.tar.bz2
+    dest: $HOME/
+
+- name: Extract CRIU tar file
+  unarchive:
+    src: criu-3.14.tar.bz2
+    dest: $HOME/
+    remote_src: yes
+
+- name: Run make
+  shell: |
+    make clean
+    make
+    sudo make install
+  args:
+    chdir: $HOME/criu-3.14/
+
+- name: Verify CRIU installation
+  become: yes
+  shell: |
+    criu check
+    criu check --all
+  register: check_criu_installation
+
+- debug:
+    msg: 
+    - "{{ check_criu_installation.stdout.split('\n') }}"

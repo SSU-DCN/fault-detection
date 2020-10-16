@@ -13,7 +13,8 @@
     address:
       # EXTERNAL_IP
       # INTERNAL_IP
-      KUBERNETES_PUBLIC_ADDRESS: 192.168.5.96 # ip of the master node
+      worker1_address: 192.168.10.13
+      KUBERNETES_PUBLIC_ADDRESS: 192.168.10.96 # ip of the master node
       KUBERNETES_HOSTNAMES: kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.svc.cluster.local
 # - name: Create folder 
 #   shell: mkdir -p keys
@@ -59,7 +60,7 @@
   shell: cfssl gencert -initca ca-csr.json | cfssljson -bare ca
 
 # Certificate Authority - The Admin Client Certificate: admin-key.pem and admin.pem
-- name: Certificate Authority config json
+- name: Certificate Authority admin config json
   copy:
     dest: $HOME/fault-detection/docs/anisble-playbook/kubernetes-the-hard-way/admin-csr.json
     content: |
@@ -242,3 +243,7 @@
 
 - name: Generate service-account Certificate
   shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes service-account-csr.json | cfssljson -bare service-account
+
+- name: Transfer ca.pem and key.pem to workers
+  command: scp ca.pem {{ item.value }}-key.pem {{ item.value }}.pem dcn@{{ address.worker1_address }}:~/
+  with_dict: "{{ workers }}"
