@@ -14,8 +14,10 @@
 - name: Check if go is installed?
   shell: |
     rm go1.15.linux-amd64.tar.gz
-    ls /usr/local | grep go
+    ls /usr/local
   register: check_go
+  args:
+    warn: no
 
 # If go was'nt installed, just move go to /usr/local 
 - name: move go file to /usr/local if there is no go
@@ -23,7 +25,7 @@
   shell: |
     mv go /usr/local
     rm -rf -R go
-  when: check_go.stdout == ""
+  when: not check_go.stdout is search("go")
   args:
     warn: no
 
@@ -34,7 +36,7 @@
     rm -rf /usr/local/go
     mv go /usr/local
     rm -rf -R go
-  when: check_go.stdout != ""
+  when: check_go.stdout is search("go")
   args:
     warn: no
 
@@ -69,6 +71,17 @@
 - name: check version
   shell: go version
   register: go_version
+  ignore_errors: True
+
+# Check where is go?
+- name: Symlink go
+  become: yes
+  file:
+    src: /usr/local/go/bin/go
+    dest: /usr/bin/go
+    state: link
+  # shell: ln -s /usr/local/go/bin/go /usr/bin/go
+  when: "'not found' in go_version.stderr"
 
 - debug:
     msg:
