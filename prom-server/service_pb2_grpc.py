@@ -19,6 +19,11 @@ class MonitorStub(object):
                 request_serializer=service__pb2.MonitorRequest.SerializeToString,
                 response_deserializer=service__pb2.MonitorReply.FromString,
                 )
+        self.DelTargetRequest = channel.unary_unary(
+                '/Monitor/DelTargetRequest',
+                request_serializer=service__pb2.VnfId.SerializeToString,
+                response_deserializer=service__pb2.MonitorReply.FromString,
+                )
 
 
 class MonitorServicer(object):
@@ -30,12 +35,23 @@ class MonitorServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def DelTargetRequest(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_MonitorServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'NewTargetRequest': grpc.unary_unary_rpc_method_handler(
                     servicer.NewTargetRequest,
                     request_deserializer=service__pb2.MonitorRequest.FromString,
+                    response_serializer=service__pb2.MonitorReply.SerializeToString,
+            ),
+            'DelTargetRequest': grpc.unary_unary_rpc_method_handler(
+                    servicer.DelTargetRequest,
+                    request_deserializer=service__pb2.VnfId.FromString,
                     response_serializer=service__pb2.MonitorReply.SerializeToString,
             ),
     }
@@ -61,6 +77,23 @@ class Monitor(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/Monitor/NewTargetRequest',
             service__pb2.MonitorRequest.SerializeToString,
+            service__pb2.MonitorReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def DelTargetRequest(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/Monitor/DelTargetRequest',
+            service__pb2.VnfId.SerializeToString,
             service__pb2.MonitorReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
