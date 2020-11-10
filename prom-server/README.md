@@ -5,7 +5,7 @@ request to Prometheus without accessing to the server
 
 ## Start commands
 ```
-python3 server.py  --filesd file-sd-sample.json --alertfile alert-file-sample.yaml
+python3 server.py  --filesd targets.json --alertfile alert-rule.yml
 --filesd: The location of file-servicediscovery that is listed in the Prometheus configuration
 --alert-file: The location of alert rule file that is listed in the Prometheus configuration
 ```
