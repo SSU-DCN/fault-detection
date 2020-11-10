@@ -1,26 +1,2 @@
 [
-    {
-        "labels": {
-            "vnf_name": "test"
-        },
-        "target": "192.168.1.1"
-    },
-    {
-        "labels": {
-            "vnf_name": "VDU1"
-        },
-        "target": "192.168.5.63"
-    },
-    {
-        "labels": {
-            "vnf_name": "VDU1"
-        },
-        "target": "192.168.5.96"
-    },
-    {
-        "labels": {
-            "vnf_name": "VDU1"
-        },
-        "target": "192.168.5.59"
-    }
 ]
