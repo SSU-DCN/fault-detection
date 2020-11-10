@@ -5,7 +5,7 @@ groups:
     annotations:
       description: '{{ $labels.job }} Memory Usage: {{ $value }}'
       summary: High Memory Usage on {{ $labels.instance }}
-    duration: 5s
+    for: 5s
     expr: node_memory_Active > 10000
     labels:
       severity: major
