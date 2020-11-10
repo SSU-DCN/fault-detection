@@ -1,4 +1,4 @@
-group:
+groups:
 - name: alert_memory
   rules:
   - alert: high_cpu
