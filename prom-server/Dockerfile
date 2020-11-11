@@ -12,8 +12,10 @@ COPY prometheus.yml /etc/prometheus/prometheus.yml
 WORKDIR /prometheus
 COPY . .
 RUN python3 -m pip install -r requirements.txt
+
 # RUN service prometheus start
 CMD prometheus --config.file="/etc/prometheus/prometheus.yml" \
     && python3 server.py  --filesd /etc/prometheus/targets.json --alertfile /etc/prometheus/alert-rule.yml
-# EXPOSE 9090
-# RUN systemctl enable prometheus
+
+# Usage:
+# docker build -t starlab:v1 --force-rm -f Dockerfile .
