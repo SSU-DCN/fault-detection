@@ -22,14 +22,14 @@ class MonitorServicer(service_pb2_grpc.MonitorServicer):
 
       for vdu in request.vdus:
         fild_sd.add_new_target(vdu, request.vnf_id)
-        alerts.add_new_rule(vdu.alerts, request.vnf_id)
+        alerts.add_new_rule(alerts=vdu.alerts, vnf_id=request.vnf_id, vdu_name=vdu.vdu_name)
       
       target_file.write_to_file(str(fild_sd))
       alert_file.write_to_file(str(alerts))
       
       # Reload prometheus configuration
       r = requests.post("http://127.0.0.1:9090/-/reload")
-      print(r)
+      print("New target created")
       response = service_pb2.MonitorReply(message = "", status =1)
       return response
     except:
@@ -46,10 +46,16 @@ class MonitorServicer(service_pb2_grpc.MonitorServicer):
       alert_file_content = alert_file.open_file()
       alerts = Alert(alert_file_content)
 
-      fild_sd.del_target(request.vnf_id)
+      fild_sd.del_target(vnf_id = request.vnf_id)
       target_file.write_to_file(str(fild_sd))
 
+      alerts.delete_rule(vnf_id = request.vnf_id)
+      alert_file.write_to_file(str(alerts))
+
       response = service_pb2.MonitorReply(message = "", status =1)
+      r = requests.post("http://127.0.0.1:9090/-/reload")
+      print("Target deleted")
+
       return response
     except:
       traceback.print_exc(file=sys.stdout)
