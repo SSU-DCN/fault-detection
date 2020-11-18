@@ -9,5 +9,5 @@ $ sudo apt install ansible
 ```
 To run the scripts:
 ```
-$ ansible -i hosts main.yaml
+$ ansible-playbook -i hosts main.yaml
 ```
