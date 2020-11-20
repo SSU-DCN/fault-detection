@@ -7,5 +7,5 @@ set -m
 python3 server.py  --filesd /etc/prometheus/targets.json --alertfile /etc/prometheus/alert-rule.yml &
   
 # Start the helper process
-prometheus $1
+prometheus --config.file=/etc/prometheus/prometheus.yml $@
 

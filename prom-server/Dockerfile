@@ -18,8 +18,8 @@ RUN python3 -m pip install -r requirements.txt
 #     && python3 server.py  --filesd /etc/prometheus/targets.json --alertfile /etc/prometheus/alert-rule.yml
 
 ENTRYPOINT ["/bin/bash", "extendPrometheus.sh"]
-CMD ["--config.file=/etc/prometheus/prometheus.yml"]
+CMD ["--web.enable-lifecycle"]
 
 # Usage:
 # docker build -t starlab:v1 --force-rm -f Dockerfile .
-# docker run -p 9090:9090 --name prometheus -itd starlab:v1 --config.file=/etc/prometheus/prometheus.yml
+# docker run -p 9090:9090 --name prometheus -itd starlab:v1 [option]
