@@ -14,7 +14,7 @@ The ref link for installing Ansible guide: https://docs.ansible.com/ansible/late
 
 To run the scripts:
 ```
-$ ansible -i hosts main.yaml
+$ ansible-playbook -i hosts main.yaml
 ```
 Note:
 - This document use "dcn" that is set as root user in both master and worker node.
