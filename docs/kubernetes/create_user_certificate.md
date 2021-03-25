@@ -1,5 +1,5 @@
 ## Create key
-opensql genrsa -out prometheus.key 2048
+openssl genrsa -out prometheus.key 2048
 
 ## Create key with username: prometheus, group: monitor-tools
 openssl req -new -key prometheus.key -out prometheus.csr -subj "/CN=prometheus/O=monitor-tools"
