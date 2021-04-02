@@ -46,8 +46,6 @@
   tasks:
     - include: tasks/kube-dependencies.yml
       vars: 
-        kubelet_version: 1.18.0-00
-        kubeadm_version: 1.18.0-00
 
 - name: initalize-cluster
   hosts: master
@@ -55,7 +53,6 @@
   tasks:
     - include: tasks/initalize-cluster.yml
       vars: 
-        kubectl_version: 1.18.0-00
         pod_network_cidr: 10.244.0.0/16
 
 - hosts: master

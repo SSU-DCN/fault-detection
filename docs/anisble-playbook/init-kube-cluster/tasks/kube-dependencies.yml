@@ -23,11 +23,11 @@
 
 - name: install kubelet
   apt:
-    name: "kubelet={{ kubelet_version }}"
+    name: "kubelet"
     state: present
     update_cache: true
 
 - name: install kubeadm
   apt:
-    name: "kubeadm={{ kubeadm_version }}"
+    name: "kubeadm"
     state: present
