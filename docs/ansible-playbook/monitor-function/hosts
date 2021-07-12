@@ -1,0 +1,2 @@
+[prometheus]
+prometheus ansible_host=192.168.5.139

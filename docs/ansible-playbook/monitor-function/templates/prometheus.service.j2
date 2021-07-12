@@ -1,0 +1,31 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=Prometheus
+After=network-online.target
+Requires=local-fs.target
+After=local-fs.target
+
+[Service]
+Type=simple
+Environment="GOMAXPROCS={{ ansible_processor_vcpus|default(ansible_processor_count) }}"
+User=prometheus
+Group=prometheus
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart={{ _prometheus_binary_install_dir }}/prometheus \
+  --storage.tsdb.path={{ prometheus_db_dir }} \
+{% if prometheus_version is version('2.7.0', '>=') %}
+  --storage.tsdb.retention.time={{ prometheus_storage_retention }} \
+{% else %}
+  --storage.tsdb.retention={{ prometheus_storage_retention }} \
+{% endif %}
+  --web.console.libraries={{ prometheus_config_dir }}/console_libraries \
+  --web.console.templates={{ prometheus_config_dir }}/consoles \
+  --web.listen-address={{ prometheus_web_listen_address }} \
+  --config.file={{ prometheus_config_dir }}/prometheus.yml
+
+SyslogIdentifier=prometheus
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
