@@ -1,0 +1,7 @@
+---
+- name: 'Master Playbook'
+  hosts: prometheus
+  tasks:
+    - name: 'Calling prometheus role'
+      import_role:
+        name: 'prometheus'

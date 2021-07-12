@@ -1,2 +1,5 @@
 [prometheus]
-prometheus ansible_host=192.168.5.139
+prometheus_host ansible_host=192.168.5.139 ansible_user=ubuntu
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3

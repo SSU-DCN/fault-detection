@@ -3,3 +3,5 @@
   become: true
 - include: configure.yml
   become: true
+- include: install_prom_server.yml
+  become: true

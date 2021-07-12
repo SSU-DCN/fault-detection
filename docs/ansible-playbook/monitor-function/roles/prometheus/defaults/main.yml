@@ -1,0 +1,50 @@
+---
+prometheus_version: 2.28.1
+prometheus_binary_local_dir: ''
+prometheus_skip_install: false
+__prometheus_checksum: 91dd91e13f30fe520e01175ca1027dd09a458d4421a584ba557ba88b38803f27
+
+prometheus_config_dir: /etc/prometheus
+prometheus_db_dir: /var/lib/prometheus
+prometheus_web_listen_address: "0.0.0.0:9090"
+prometheus_web_external_url: ''
+prometheus_config_file: 'prometheus.yml.j2'
+
+prometheus_storage_retention: "30d"
+
+prometheus_alertmanager_config: []
+prometheus_alert_relabel_configs: []
+prometheus_scrape_configs:
+  - job_name: "prometheus"
+    metrics_path: "{{ prometheus_metrics_path }}"
+    static_configs:
+      - targets:
+        - "{{ ansible_fqdn | default(ansible_host) | default('localhost') }}:9090"
+  - job_name: "register_service"
+    file_sd_configs:
+      - files:
+        - "{{ prometheus_config_dir }}/file_sd/node.json"
+
+prometheus_web_config:
+  tls_server_config: {}
+  http_server_config: {}
+  basic_auth_users: {}
+
+prometheus_targets: 
+  node:
+   - targets:
+       - localhost:9100
+
+groups:
+- name: example
+  rules:
+
+prometheus_alert_rules:
+  - alert: InstanceDown
+    expr: up == 0
+    for: 5m
+    labels:
+      severity: page
+    annotations:
+      summary: '{% raw %}Instance {{ $labels.instance }} down{% endraw %}'
+      description: '{% raw %} {{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.{% endraw %}'

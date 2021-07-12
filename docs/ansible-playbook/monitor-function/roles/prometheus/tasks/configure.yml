@@ -1,3 +1,7 @@
+---
+- name: Set prometheus external metrics path
+  set_fact:
+    prometheus_metrics_path: "/{{ ( prometheus_web_external_url + '/metrics' ) | regex_replace('^(.*://)?(.*?)/') }}"
 - name: configure prometheus
   template:
     src: "{{ prometheus_config_file }}"
@@ -23,8 +27,8 @@
   copy:
     content: |
       #jinja2: lstrip_blocks: True
-      {{ item.value | to_nice_yaml(indent=2) }}
-    dest: "{{ prometheus_config_dir }}/file_sd/{{ item.key }}.yml"
+      {{ item.value | to_json(indent=2) }}
+    dest: "{{ prometheus_config_dir }}/file_sd/{{ item.key }}.json"
     force: true
     owner: root
     group: prometheus
@@ -32,12 +36,15 @@
   with_dict: "{{ prometheus_targets }}"
   when: prometheus_targets != {}
 
-- name: copy prometheus custom static targets
-  copy:
-    src: "{{ item }}"
-    dest: "{{ prometheus_config_dir }}/file_sd/"
-    force: true
+- name: alerting rules file
+  template:
+    src: "alert.rules.j2"
+    dest: "{{ prometheus_config_dir }}/rules/webhook.rules"
     owner: root
     group: prometheus
     mode: 0640
-  with_fileglob: "{{ prometheus_static_targets_files }}"
+    validate: "{{ _prometheus_binary_install_dir }}/promtool check rules %s"
+  when:
+    - prometheus_alert_rules != []
+  notify:
+    - reload prometheus

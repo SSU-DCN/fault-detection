@@ -5,6 +5,7 @@ from file_manipulation import File
 from alert import Alert
 import sys, traceback
 import requests
+import os
 
 class MonitorServicer(service_pb2_grpc.MonitorServicer):
   def __init__(self, target_file, alert_file):
@@ -28,7 +29,7 @@ class MonitorServicer(service_pb2_grpc.MonitorServicer):
       alert_file.write_to_file(str(alerts))
       
       # Reload prometheus configuration
-      r = requests.post("http://127.0.0.1:9090/-/reload")
+      r = requests.post(os.environ['prometheus_api_server'] + "/-/reload")
       print("New target created")
       response = service_pb2.MonitorReply(message = "", status =1)
       return response
@@ -53,7 +54,7 @@ class MonitorServicer(service_pb2_grpc.MonitorServicer):
       alert_file.write_to_file(str(alerts))
 
       response = service_pb2.MonitorReply(message = "", status =1)
-      r = requests.post("http://127.0.0.1:9090/-/reload")
+      r = requests.post(os.environ['prometheus_api_server']+ "/-/reload")
       print("Target deleted")
 
       return response

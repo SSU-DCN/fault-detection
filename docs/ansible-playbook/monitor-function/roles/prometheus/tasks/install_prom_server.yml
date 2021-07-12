@@ -1,0 +1,35 @@
+---
+- name: install Docker
+  package:
+    name: docker.io
+    state: latest
+- name: install Pip
+  package:
+    name: python3-pip
+    state: latest
+- name: Install Docker Module for Python
+  pip:
+    name: 
+    - docker
+    - docker-compose
+- name: Run the Prometheus GRPC server
+  docker_service:
+    project_name: grpc server
+    definition:
+      version: '3'
+      services:
+        server:
+          image: dcnstarlab/prometheus-grpc-server:latest
+          volumes:
+            - type: bind
+              source: "{{ prometheus_config_dir }}/file_sd/node.json"
+              target: "/app/targets.json"
+            - type: bind
+              source: "{{ prometheus_config_dir }}/rules/webhook.rules"
+              target: "/app/alert-rule.yml"
+          ports: 
+            - 50051:50051
+
+
+
+
