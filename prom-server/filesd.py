@@ -20,7 +20,7 @@ class FileSD():
   def del_target(self, vnf_id):
     result = []
     for i in self._content:
-      if i['labels']['vnf_id'] != vnf_id:
+      if i.get('labels', {}).get('vnf_id', '') != vnf_id:
         result.append(i)
     self._content = result
   def __repr__(self):
