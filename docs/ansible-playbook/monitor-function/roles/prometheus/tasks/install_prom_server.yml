@@ -27,6 +27,8 @@
             - type: bind
               source: "{{ prometheus_config_dir }}/rules/webhook.rules"
               target: "/app/alert-rule.yml"
+          environment:
+            prometheus_api_server: "http://{{ansible_all_ipv4_addresses}}:9090"
           ports: 
             - 50051:50051
 
