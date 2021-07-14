@@ -12,7 +12,10 @@ prometheus_config_file: 'prometheus.yml.j2'
 
 prometheus_storage_retention: "30d"
 
-prometheus_alertmanager_config: []
+prometheus_alertmanager_config: 
+  - static_configs:
+    - targets:
+      - "{{hostvars['alertmanager_host']['ansible_host']}}:9093"
 prometheus_alert_relabel_configs: []
 prometheus_scrape_configs:
   - job_name: "prometheus"

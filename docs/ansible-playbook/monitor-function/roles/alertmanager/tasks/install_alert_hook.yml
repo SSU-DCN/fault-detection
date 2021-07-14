@@ -1,0 +1,31 @@
+---
+- name: install Docker
+  package:
+    name: docker.io
+    state: latest
+- name: install Pip
+  package:
+    name: python3-pip
+    state: latest
+- name: Install Docker Module for Python
+  pip:
+    name: 
+    - docker
+    - docker-compose
+- name: Run the Prometheus GRPC server
+  docker_service:
+    project_name: alert hook
+    definition:
+      version: '3'
+      services:
+        server:
+          image: dcnstarlab/alerthook:latest
+          environment:
+            auth_url: "{{auth_url}} | default('http://127.0.0.1:/identity/v3')"
+            username: "{{username}} | default('admin')"
+            password: "{{password}} | default('devstack')"
+            project_name: "{{project_name}} | default('admin')"
+            user_domain_id: "{{user_domain_id}} | default('default')"
+            project_domain_id : "{{project_domain_id }} | default('default')"
+          ports: 
+            - 3030:3030

@@ -1,7 +1,14 @@
 ---
-- name: 'Master Playbook'
+- name: 'Calling prometheus role'
   hosts: prometheus
   tasks:
     - name: 'Calling prometheus role'
       import_role:
         name: 'prometheus'
+
+- name: 'Calling Alert Manager role'
+  hosts: alertmanager
+  tasks:
+    - name: 'Calling Alert Manager role'
+      import_role:
+        name: 'alertmanager'

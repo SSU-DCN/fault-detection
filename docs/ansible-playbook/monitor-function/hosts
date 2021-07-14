@@ -1,5 +1,8 @@
 [prometheus]
 prometheus_host ansible_host=192.168.5.139 ansible_user=ubuntu
 
+[alertmanager]
+alertmanager_host ansible_host=192.168.5.175 ansible_user=ubuntu
+
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3
