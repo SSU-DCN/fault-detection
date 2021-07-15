@@ -26,3 +26,6 @@
     - alertmanager_run
 
 - meta: flush_handlers
+
+- include: install_alert_hook.yml
+  become: true

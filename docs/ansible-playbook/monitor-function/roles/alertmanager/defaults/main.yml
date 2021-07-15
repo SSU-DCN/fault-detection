@@ -90,10 +90,10 @@ alertmanager_amtool_config_alertmanager_url: "{{ alertmanager_web_external_url }
 alertmanager_amtool_config_output: 'extended'
 
 
-#prometheus_api_server: "http://{{ansible_all_ipv4_addresses}}:9090"
-#auth_url: "{{auth_url}}
-#username: "{{username}}
-#password: "{{password}}
-#project_name: "{{project_name}}
-#user_domain_id: "{{user_domain_id}}
-#project_domain_id : "{{project_domain_id }}
+
+auth_url: ""
+username: ""
+password: ""
+project_name: ""
+user_domain_id: ""
+project_domain_id : ""

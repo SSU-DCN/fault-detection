@@ -12,7 +12,7 @@
     name: 
     - docker
     - docker-compose
-- name: Run the Prometheus GRPC server
+- name: Run the Alert Hook Server
   docker_service:
     project_name: alert hook
     definition:
