@@ -58,7 +58,7 @@ alertmanager_cluster:
 alertmanager_receivers:
 - name: 'web.hook'
   webhook_configs:
-          - url: 'http://127.0.0.1:3000/alerts'
+          - url: 'http://127.0.0.1:3030/alerts'
 
 alertmanager_inhibit_rules: []
 # alertmanager_inhibit_rules:
@@ -73,9 +73,9 @@ alertmanager_inhibit_rules: []
 #       label: value3|value5
 
 alertmanager_route: 
-  group_by: ['policy', 'orchestration', 'policyfunction', 'alerthook']
+  group_by: ['alertname']
   group_wait: 10s
-  group_interval: 5m
+  group_interval: 10s
   repeat_interval: 4h
   receiver: 'web.hook'
 
@@ -89,11 +89,5 @@ alertmanager_amtool_config_alertmanager_url: "{{ alertmanager_web_external_url }
 # Extended output of `amtool` commands, use '' for less verbosity
 alertmanager_amtool_config_output: 'extended'
 
-
-
-auth_url: ""
-username: ""
-password: ""
-project_name: ""
-user_domain_id: ""
-project_domain_id : ""
+auth_url: "http://192.168.5.5/identity/v3"
+orchestration_url: "http://192.168.5.5:9890"
